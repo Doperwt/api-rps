@@ -55,7 +55,7 @@ module.exports = io => {
 
       // Add the user to the players
       req.game.players = [...req.game.players, { userId }]
-
+      debugger
       req.game.save()
         .then((game) => {
           req.game = game

@@ -3,7 +3,7 @@ const router = require('express').Router()
 const passport = require('../config/auth')
 const { Game } = require('../models')
 const utils = require('../lib/utils')
-
+const processMove = require('../lib/processMove')
 const authenticate = passport.authorize('jwt', { session: false })
 
 module.exports = io => {
@@ -61,16 +61,37 @@ module.exports = io => {
     })
     .patch('/games/:id', authenticate, (req, res, next) => {
       const id = req.params.id
-      const patchForGame = req.body
-
+      const weapon = req.body.move
+      const userId = req.account.id.toString()
+      console.log(id,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
       Game.findById(id)
         .then((game) => {
+          // let patchForGame = JSON.parse(JSON.stringify(game))
+          // console.log(game.players)
+          // const  player0  = game.players[0].userId.toString()
+          // const  player1  = game.players[1].userId.toString()
+          // console.log(player0,player1)
+          // let players = game.players
           if (!game) { return next() }
-
-          const updatedGame = { ...game, ...patchForGame }
-
+          // debugger
+          // if(userId== player0 ) {
+          //   if (players[0].symbol === null ){
+          //     game.players[0].symbol = weapon
+          //     console.log(game.player[0].symbol)
+          //   }
+          // }
+          // else if (userId== player1){
+          //   if (players[1].symbol === null ){
+          //     game.players[1].symbol = weapon
+          //     console.log(game.player[1].symbol)
+          //   }
+          // }
+          const updatedGame = processMove(game,weapon, userId)
+          console.log(updatedGame)
+          debugger
           Game.findByIdAndUpdate(id, { $set: updatedGame }, { new: true })
             .then((game) => {
+              // debugger
               io.emit('action', {
                 type: 'GAME_UPDATED',
                 payload: game

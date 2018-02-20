@@ -7,7 +7,7 @@ const jwtOptions = require('./jwt')
 
 const tokenStrategy = new Strategy(jwtOptions, (jwtPayload, done) => {
   console.log('payload received', jwtPayload)
-  
+
   User.findById(jwtPayload.id)
     .then((user) => {
       if (user) {
